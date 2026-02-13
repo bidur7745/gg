@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <title>SwasthyaMitra</title>
+  <rect x="6" y="4" width="8" height="24" rx="2" fill="#1ABC9C"/>
+  <rect x="10" y="0" width="8" height="24" rx="2" fill="#14A58A" transform="rotate(90 14 12)"/>
+</svg>
