@@ -9,6 +9,7 @@ const AdminContextProvider = (props) => {
     localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
   );
   const [doctors, setDoctors] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [dashData, setDashData] = useState(false);
 
@@ -23,12 +24,13 @@ const AdminContextProvider = (props) => {
       );
       if (data.success) {
         setDoctors(data.doctors);
-        console.log(data.doctors);
       } else {
         toast.error(data.message);
       }
+      return Promise.resolve();
     } catch (error) {
       toast.error(error.message);
+      return Promise.reject(error);
     }
   };
 
@@ -50,6 +52,104 @@ const AdminContextProvider = (props) => {
     }
   };
 
+  const deleteDoctor = async (docId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/delete-doctor",
+        { docId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllDoctors();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const getAllHospitals = async () => {
+    try {
+      const { data } = await axios.get(
+        backendUrl + "/api/admin/all-hospitals",
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        setHospitals(data.hospitals);
+      } else {
+        toast.error(data.message);
+      }
+      return Promise.resolve();
+    } catch (error) {
+      toast.error(error.message);
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteHospital = async (hospitalId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/delete-hospital",
+        { hospitalId },
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllHospitals();
+        getAllDoctors(); // Refresh doctors to update hospital references
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const updateDoctor = async (formData) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/update-doctor",
+        formData,
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllDoctors();
+        return { success: true };
+      } else {
+        toast.error(data.message);
+        return { success: false };
+      }
+    } catch (error) {
+      toast.error(error.message);
+      return { success: false };
+    }
+  };
+
+  const updateHospital = async (formData) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/update-hospital",
+        formData,
+        { headers: { aToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        getAllHospitals();
+        getAllDoctors(); // Refresh doctors to update hospital references
+        return { success: true };
+      } else {
+        toast.error(data.message);
+        return { success: false };
+      }
+    } catch (error) {
+      toast.error(error.message);
+      return { success: false };
+    }
+  };
+
   const getAllAppointments = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
@@ -58,7 +158,6 @@ const AdminContextProvider = (props) => {
 
       if (data.success) {
         setAppointments(data.appointments);
-        console.log(data.appointments);
       } else {
         toast.error(data.message);
       }
@@ -93,7 +192,6 @@ const AdminContextProvider = (props) => {
 
       if (data.success) {
         setDashData(data.dashData);
-        console.log(data.dashData);
       } else {
         toast.error(data.message);
       }
@@ -109,6 +207,12 @@ const AdminContextProvider = (props) => {
     doctors,
     getAllDoctors,
     changeAvailability,
+    deleteDoctor,
+    updateDoctor,
+    hospitals,
+    getAllHospitals,
+    deleteHospital,
+    updateHospital,
     appointments,
     setAppointments,
     getAllAppointments,

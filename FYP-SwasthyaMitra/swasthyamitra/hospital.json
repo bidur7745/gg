@@ -1,0 +1,168 @@
+[
+    {
+      "name": "Bir Hospital",
+      "address": { "line1": "Mahaboudha Road", "line2": "Kathmandu" },
+      "phone": "014222111",
+      "email": "info@birhospital.gov.np",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1586773860418-d37222d8fce3",
+      "description": "One of the oldest and largest government hospitals providing multi-specialty services.",
+      "isActive": true,
+      "date": 1708100000000
+    },
+    {
+      "name": "Patan Hospital",
+      "address": { "line1": "Lagankhel", "line2": "Lalitpur" },
+      "phone": "015522266",
+      "email": "info@patanhospital.org.np",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d",
+      "description": "A leading teaching hospital known for quality healthcare services.",
+      "isActive": true,
+      "date": 1708100001000
+    },
+    {
+      "name": "Grande International Hospital",
+      "address": { "line1": "Dhapasi", "line2": "Kathmandu" },
+      "phone": "014381111",
+      "email": "info@grandehospital.com",
+      "type": "Private",
+      "image": "https://images.unsplash.com/photo-1576091160550-2173dba999ef",
+      "description": "Modern private hospital offering advanced medical and surgical care.",
+      "isActive": true,
+      "date": 1708100002000
+    },
+    {
+      "name": "Nepal Medical College Hospital",
+      "address": { "line1": "Jorpati", "line2": "Kathmandu" },
+      "phone": "014912345",
+      "email": "info@nmcth.edu.np",
+      "type": "Community",
+      "image": "https://images.unsplash.com/photo-1538108149393-fbbd81895907",
+      "description": "Community-based teaching hospital serving local and regional patients.",
+      "isActive": true,
+      "date": 1708100003000
+    },
+    {
+      "name": "Norvic International Hospital",
+      "address": { "line1": "Thapathali", "line2": "Kathmandu" },
+      "phone": "014252855",
+      "email": "info@norvichospital.com",
+      "type": "Private",
+      "image": "https://images.unsplash.com/photo-1580281657527-47c4b5c33c3f",
+      "description": "Private hospital known for cardiology and emergency services.",
+      "isActive": true,
+      "date": 1708100004000
+    },
+    {
+      "name": "BPKIHS Hospital",
+      "address": { "line1": "Ghopa Camp", "line2": "Dharan" },
+      "phone": "025525555",
+      "email": "info@bpkihs.edu",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1504814532849-cff240bbc503",
+      "description": "Institute hospital providing tertiary-level healthcare services.",
+      "isActive": true,
+      "date": 1708100005000
+    },
+    {
+      "name": "Manipal Teaching Hospital",
+      "address": { "line1": "Fulbari", "line2": "Pokhara" },
+      "phone": "061526416",
+      "email": "info@manipalhospital.com",
+      "type": "Private",
+      "image": "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc",
+      "description": "Well-equipped private teaching hospital in Pokhara.",
+      "isActive": true,
+      "date": 1708100006000
+    },
+    {
+      "name": "Chitwan Medical College Hospital",
+      "address": { "line1": "Bharatpur", "line2": "Chitwan" },
+      "phone": "056592933",
+      "email": "info@cmc.edu.np",
+      "type": "Community",
+      "image": "https://images.unsplash.com/photo-1512678080530-7760d81faba6",
+      "description": "Community hospital offering comprehensive medical education and services.",
+      "isActive": true,
+      "date": 1708100007000
+    },
+    {
+      "name": "Koshi Hospital",
+      "address": { "line1": "Rangeli Road", "line2": "Biratnagar" },
+      "phone": "021533555",
+      "email": "info@koshihospital.gov.np",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b",
+      "description": "Regional government hospital serving eastern Nepal.",
+      "isActive": true,
+      "date": 1708100008000
+    },
+    {
+      "name": "Nepalgunj Medical College Hospital",
+      "address": { "line1": "Kohalpur", "line2": "Banke" },
+      "phone": "081520555",
+      "email": "info@ngmc.edu.np",
+      "type": "Community",
+      "image": "https://images.unsplash.com/photo-1519494080410-f9aa8f52f6c0",
+      "description": "Medical college hospital serving mid-western Nepal.",
+      "isActive": true,
+      "date": 1708100009000
+    },
+    {
+      "name": "HAMS Hospital",
+      "address": { "line1": "Dhumbarahi", "line2": "Kathmandu" },
+      "phone": "014370777",
+      "email": "info@hamshospital.com",
+      "type": "Private",
+      "image": "https://images.unsplash.com/photo-1579684385127-1ef15d508118",
+      "description": "Advanced private hospital with multi-specialty care.",
+      "isActive": true,
+      "date": 1708100010000
+    },
+    {
+      "name": "Janakpur Provincial Hospital",
+      "address": { "line1": "Murli Chowk", "line2": "Janakpur" },
+      "phone": "041520444",
+      "email": "info@janakpurhospital.gov.np",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1584433144859-1fc3ab64a957",
+      "description": "Provincial government hospital providing essential health services.",
+      "isActive": true,
+      "date": 1708100011000
+    },
+    {
+      "name": "Lumbini Provincial Hospital",
+      "address": { "line1": "Butwal", "line2": "Rupandehi" },
+      "phone": "071540555",
+      "email": "info@lumbinihospital.gov.np",
+      "type": "Government",
+      "image": "https://images.unsplash.com/photo-1584432810601-6c7f27d2362b",
+      "description": "Major provincial hospital in western Nepal.",
+      "isActive": true,
+      "date": 1708100012000
+    },
+    {
+      "name": "Gandaki Medical College Hospital",
+      "address": { "line1": "Prithvi Chowk", "line2": "Pokhara" },
+      "phone": "061527355",
+      "email": "info@gmc.edu.np",
+      "type": "Community",
+      "image": "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b",
+      "description": "Community-based teaching hospital in Gandaki Province.",
+      "isActive": true,
+      "date": 1708100013000
+    },
+    {
+      "name": "Star Hospital",
+      "address": { "line1": "Sanepa", "line2": "Lalitpur" },
+      "phone": "015550111",
+      "email": "info@starhospital.com",
+      "type": "Private",
+      "image": "https://images.unsplash.com/photo-1584467735871-8f04b8b8a6e7",
+      "description": "Private multi-specialty hospital with modern facilities.",
+      "isActive": true,
+      "date": 1708100014000
+    }
+  ]
+  

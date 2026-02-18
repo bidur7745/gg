@@ -15,16 +15,51 @@ const Appointment = () => {
   const navigate = useNavigate();
 
   const [docInfo, setDocInfo] = useState(null);
+  const [docHospitals, setDocHospitals] = useState([]);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchDocInfo = async () => {
-    const docInfo = doctors.find((doc) => doc._id === docId);
-    setDocInfo(docInfo);
+    try {
+      // Try to get from context first
+      const docFromContext = doctors.find((doc) => doc._id === docId);
+      if (docFromContext) {
+        setDocInfo(docFromContext);
+        setDocHospitals(docFromContext.hospitals || []);
+        setLoading(false);
+      }
+
+      // Also fetch from API to get full details with hospitals
+      if (backendUrl) {
+        try {
+          const { data } = await axios.get(`${backendUrl}/api/doctor/detail/${docId}`);
+          if (data.success && data.doctor) {
+            setDocInfo(data.doctor);
+            setDocHospitals(data.doctor.hospitals || []);
+          }
+        } catch (error) {
+          console.error('Error fetching doctor details:', error);
+          // Continue with context data
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching doctor:', error);
+      // Fallback to context data
+      const docFromContext = doctors.find((doc) => doc._id === docId);
+      if (docFromContext) {
+        setDocInfo(docFromContext);
+        setDocHospitals(docFromContext.hospitals || []);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getAvailableSlots = async () => {
+    if (!docInfo || !docInfo.slots_booked) return;
+
     setDocSlots([]);
 
     // getting current date
@@ -66,11 +101,10 @@ const Appointment = () => {
         const slotDate = day + "_" + month + "_" + year;
         const slotTime = formattedTime;
 
-        const isSlotAvailable =
+        const isSlotAvailable = !(
           docInfo.slots_booked[slotDate] &&
           docInfo.slots_booked[slotDate].includes(slotTime)
-            ? false
-            : true;
+        );
 
         if (isSlotAvailable) {
           // add slot to array
@@ -128,7 +162,7 @@ const Appointment = () => {
 
   useEffect(() => {
     fetchDocInfo();
-  }, [doctors, docId]);
+  }, [docId, backendUrl]);
 
   useEffect(() => {
     getAvailableSlots();
@@ -138,9 +172,30 @@ const Appointment = () => {
     console.log(docSlots);
   }, [docSlots]);
 
+  if (loading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <p className="text-gray-500">Loading doctor information...</p>
+      </div>
+    );
+  }
+
+  if (!docInfo) {
+    return (
+      <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4">
+        <p className="text-gray-500">Doctor not found.</p>
+        <button
+          onClick={() => navigate('/doctors')}
+          className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90"
+        >
+          Browse Doctors
+        </button>
+      </div>
+    );
+  }
+
   return (
-    docInfo && (
-      <div>
+    <div>
         {/* -------------------- Doctor Details -------------------- */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div>
@@ -182,6 +237,26 @@ const Appointment = () => {
                 {docInfo.fees}
               </span>
             </p>
+
+            {/* Hospitals where doctor works */}
+            {docHospitals && docHospitals.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-600 mb-2">
+                  Available at Hospitals:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {docHospitals.map((hospital) => (
+                    <button
+                      key={hospital._id || hospital}
+                      onClick={() => navigate(`/hospital/${hospital._id || hospital}`)}
+                      className="text-xs px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-full hover:bg-emerald-200 transition-colors"
+                    >
+                      {typeof hospital === 'object' ? hospital.name : 'Hospital'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -233,7 +308,7 @@ const Appointment = () => {
         {/* -------------------- Listing Related Doctors -------------------- */}
         <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
       </div>
-    )
+    
   );
 };
 

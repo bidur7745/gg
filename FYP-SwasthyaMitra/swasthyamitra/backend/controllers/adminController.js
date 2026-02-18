@@ -5,6 +5,7 @@ import doctorModel from "../models/doctorModel.js";
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
 import userModel from "../models/userModel.js";
+import hospitalModel from "../models/hospitalModel.js";
 
 // API for adding doctor
 const addDoctor = async (req, res) => {
@@ -34,14 +35,27 @@ const addDoctor = async (req, res) => {
       !fees ||
       !address
     ) {
-      return res.json({ success: false, message: "Missing Details" });
+      return res.json({ success: false, message: "Missing required details" });
+    }
+
+    if (!imageFile) {
+      return res.json({ success: false, message: "Doctor image is required" });
+    }
+
+    // Check if doctor with same email already exists
+    const existingDoctor = await doctorModel.findOne({ email });
+    if (existingDoctor) {
+      return res.json({
+        success: false,
+        message: "Doctor with this email already exists",
+      });
     }
 
     // validating email format
     if (!validator.isEmail(email)) {
       return res.json({
         success: false,
-        message: "Please enter a valid email",
+        message: "Please enter a valid email address",
       });
     }
 
@@ -49,7 +63,15 @@ const addDoctor = async (req, res) => {
     if (password.length < 8) {
       return res.json({
         success: false,
-        message: "Please enter a strong password",
+        message: "Password must be at least 8 characters long",
+      });
+    }
+
+    // Validate fees
+    if (isNaN(fees) || Number(fees) < 0) {
+      return res.json({
+        success: false,
+        message: "Please enter a valid fee amount",
       });
     }
 
@@ -63,6 +85,31 @@ const addDoctor = async (req, res) => {
     });
     const imageUrl = imageUpload.secure_url;
 
+    // Parse hospitals if provided
+    let hospitalsArr = [];
+    if (req.body.hospitals) {
+      try {
+        hospitalsArr = JSON.parse(req.body.hospitals);
+        // Validate hospital IDs exist
+        if (Array.isArray(hospitalsArr) && hospitalsArr.length > 0) {
+          const validHospitals = await hospitalModel.find({
+            _id: { $in: hospitalsArr }
+          });
+          if (validHospitals.length !== hospitalsArr.length) {
+            return res.json({
+              success: false,
+              message: "Some selected hospitals are invalid",
+            });
+          }
+        }
+      } catch (error) {
+        return res.json({
+          success: false,
+          message: "Invalid hospital data format",
+        });
+      }
+    }
+
     const doctorData = {
       name,
       email,
@@ -74,6 +121,7 @@ const addDoctor = async (req, res) => {
       about,
       fees,
       address: JSON.parse(address),
+      hospitals: hospitalsArr,
       date: Date.now(),
     };
 
@@ -110,7 +158,10 @@ const loginAdmin = async (req, res) => {
 // API to get all doctors list for admin panel
 const allDoctors = async (req, res) => {
   try {
-    const doctors = await doctorModel.find({}).select("-password");
+    const doctors = await doctorModel.find({})
+      .select("-password")
+      .populate("hospitals", "name type address phone email image")
+      .lean();
     res.json({ success: true, doctors });
   } catch (error) {
     console.log(error);
@@ -182,6 +233,138 @@ const adminDashboard = async (req, res) => {
   }
 };
 
+// API to update doctor
+const updateDoctor = async (req, res) => {
+  try {
+    const { docId, name, email, speciality, degree, experience, about, fees, address, hospitals } = req.body;
+
+    if (!docId) {
+      return res.json({ success: false, message: "Doctor ID is required" });
+    }
+
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor) {
+      return res.json({ success: false, message: "Doctor not found" });
+    }
+
+    // Check if email is being changed and if it already exists
+    if (email && email !== doctor.email) {
+      const existingDoctor = await doctorModel.findOne({ email });
+      if (existingDoctor) {
+        return res.json({
+          success: false,
+          message: "Doctor with this email already exists",
+        });
+      }
+      if (!validator.isEmail(email)) {
+        return res.json({
+          success: false,
+          message: "Please enter a valid email address",
+        });
+      }
+    }
+
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (speciality) updateData.speciality = speciality;
+    if (degree) updateData.degree = degree;
+    if (experience) updateData.experience = experience;
+    if (about) updateData.about = about;
+    if (fees !== undefined) {
+      if (isNaN(fees) || Number(fees) < 0) {
+        return res.json({
+          success: false,
+          message: "Please enter a valid fee amount",
+        });
+      }
+      updateData.fees = Number(fees);
+    }
+    if (address) {
+      try {
+        updateData.address = JSON.parse(address);
+      } catch {
+        return res.json({
+          success: false,
+          message: "Invalid address format",
+        });
+      }
+    }
+    if (hospitals !== undefined) {
+      try {
+        const hospitalsArr = JSON.parse(hospitals);
+        if (Array.isArray(hospitalsArr)) {
+          // Validate hospital IDs exist
+          if (hospitalsArr.length > 0) {
+            const validHospitals = await hospitalModel.find({
+              _id: { $in: hospitalsArr }
+            });
+            if (validHospitals.length !== hospitalsArr.length) {
+              return res.json({
+                success: false,
+                message: "Some selected hospitals are invalid",
+              });
+            }
+          }
+          updateData.hospitals = hospitalsArr;
+        } else {
+          updateData.hospitals = [];
+        }
+      } catch {
+        return res.json({
+          success: false,
+          message: "Invalid hospital data format",
+        });
+      }
+    }
+
+    // upload new image if provided
+    if (req.file) {
+      const imageUpload = await cloudinary.uploader.upload(req.file.path, {
+        resource_type: "image",
+      });
+      updateData.image = imageUpload.secure_url;
+    }
+
+    await doctorModel.findByIdAndUpdate(docId, updateData);
+    res.json({ success: true, message: "Doctor Updated" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API to delete doctor
+const deleteDoctor = async (req, res) => {
+  try {
+    const { docId } = req.body;
+
+    if (!docId) {
+      return res.json({ success: false, message: "Doctor ID is required" });
+    }
+
+    const doctor = await doctorModel.findById(docId);
+    if (!doctor) {
+      return res.json({ success: false, message: "Doctor not found" });
+    }
+
+    // Check if doctor has any appointments
+    const hasAppointments = await appointmentModel.exists({ docId });
+    if (hasAppointments) {
+      return res.json({
+        success: false,
+        message: "Cannot delete doctor with existing appointments. Please cancel appointments first.",
+      });
+    }
+
+    await doctorModel.findByIdAndDelete(docId);
+    res.json({ success: true, message: "Doctor deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   addDoctor,
   loginAdmin,
@@ -189,4 +372,6 @@ export {
   appointmentsAdmin,
   appointmentCancel,
   adminDashboard,
+  updateDoctor,
+  deleteDoctor,
 };

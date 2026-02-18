@@ -13,13 +13,12 @@ const doctorSchema = new mongoose.Schema(
     available: { type: Boolean, default: true },
     fees: { type: Number, required: true },
     address: { type: Object, required: true },
+    hospitals: [{ type: mongoose.Schema.Types.ObjectId, ref: "hospital" }],
     date: { type: Number, required: true },
     slots_booked: { type: Object, default: {} },
   },
   { minimize: false }
 );
-
-//hospital foregin key
 
 doctorSchema.index({ name: 1 });
 doctorSchema.index({ speciality: 1 });

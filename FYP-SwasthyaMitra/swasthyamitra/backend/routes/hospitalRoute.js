@@ -1,5 +1,7 @@
 import express from 'express';
 import OpenAI from 'openai';
+import hospitalModel from '../models/hospitalModel.js';
+import doctorModel from '../models/doctorModel.js';
 
 const router = express.Router();
 
@@ -53,6 +55,43 @@ router.post('/enrich', async (req, res) => {
       success: false,
       message,
       aiDescription: null,
+    });
+  }
+});
+
+/**
+ * GET /api/hospital/:id
+ * Get single hospital by ID with doctors available at that hospital
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hospital = await hospitalModel.findById(id).lean();
+    
+    if (!hospital) {
+      return res.status(404).json({
+        success: false,
+        message: 'Hospital not found',
+      });
+    }
+
+    // Get doctors who work at this hospital
+    const doctors = await doctorModel
+      .find({ hospitals: id, available: true })
+      .select(['-password', '-email'])
+      .populate('hospitals', 'name type')
+      .lean();
+
+    res.json({
+      success: true,
+      hospital,
+      doctors,
+    });
+  } catch (err) {
+    console.error('Get hospital error:', err);
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Failed to fetch hospital',
     });
   }
 });
